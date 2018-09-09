@@ -40,19 +40,16 @@
     const setPartitioner = () => {
       let select = document.getElementById("scheme-select");
       let choice = select.options[select.selectedIndex].value;
-      console.log(choice);
       partitionGenerator = choices[choice];
       render(partitionGenerator, partitions, items);
     }
 
     const addRandom = () => {
-      console.log("allocating new server");
       partitions.push(`partition${partitions.length}`);
       render(partitionGenerator, partitions, items);
     };
 
     const removeRandom = () => {
-      console.log("a server exploded");
       partitions.pop();
       render(partitionGenerator, partitions, items);
     };
