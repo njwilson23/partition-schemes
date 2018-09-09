@@ -49,7 +49,7 @@ exports.HRW = (hosts) => {
   const weight = (hostNumber, item) => {
     const magic = 1103515245;
     const maxInt = 2**31;
-    const itemDigest = (item.hashCode() % maxInt + maxInt) % maxInt;
+    const itemDigest = (hash.md5(item) % maxInt + maxInt) % maxInt;
     return (magic * (((magic * hostNumber + 12345) % maxInt) ^ itemDigest) + 12345) % maxInt;
   };
 
@@ -72,7 +72,7 @@ exports.consistentHash = (hosts) => {
   let hostHashes = [...Array(multiplicity).keys()].map(
     (i) => hosts.map(
       (host) => {
-        return {"name": host, "i": i, "hash": hash.string(`${host}${i}`)};
+        return {"name": host, "i": i, "hash": hash.md5(`${host}${i}`)};
       }
     )
   )
@@ -80,7 +80,7 @@ exports.consistentHash = (hosts) => {
   .sort((a, b) => (a["hash"] < b["hash"]) ? -1 : (a["hash"] > b["hash"]) ? 1 : 0);
 
   return (item) => {
-    let h = hash.string(item);
+    let h = hash.md5(item);
     let i = bisectBelow(h, hostHashes.map((obj) => obj["hash"]));
     return hostHashes[i]["name"];
   }

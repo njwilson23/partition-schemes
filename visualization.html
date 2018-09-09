@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link href="style.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+  <div id="viz">
+    <div class="columnContainer">
+      <div id="partitions"></div>
+      <div id="items"></div>
+    </div>
+  </div>
+
+  <svg width="800" height="400"></svg>
+
+  <br>
+  <button type="button" id="add" onclick="addRandom()">Add</div>
+  <button type="button" id="remove" onclick="removeRandom()">Remove</div>
+
+  <script src="./partitioning.js"></script>
+  <script>
+    const partition = require('partition');
+
+    let partitions = ["partition0", "partition1", "partition2"];
+    let items = [...Array(32).keys()].map((i) => `item${i}`);
+    let partitionGenerator = partition.HRW;
+    let oldAssignments = [];
+
+    const addRandom = () => {
+      console.log("allocating new server");
+      partitions.push(`partition${partitions.length}`);
+      render(partitionGenerator, partitions, items);
+    };
+
+    const removeRandom = () => {
+      console.log("a server exploded");
+      partitions.pop();
+      render(partitionGenerator, partitions, items);
+    };
+
+    const diffAssignments = (oldAssignments, newAssignments) =>
+      newAssignments.map((n) =>
+        n.partition !== (
+          oldAssignments.length !== 0 ?
+            oldAssignments.find((o) => o.item === n.item).partition :
+            null
+        )
+      );
+
+    const render = (partitionGenerator, partitions, items) => {
+      const partitioner = partitionGenerator(partitions);
+      const assignments = items.map((it) => ({"item": it, "partition": partitioner(it)}));
+      const changedAssignments = diffAssignments(oldAssignments, assignments);
+      oldAssignments = assignments;
+
+      const itemPos = (i, n) => [(i/(n-1)) * 780 + 10, 50];
+      const partPos = (i, n) => [(i/(n-1)) * 600 + 100, 350];
+
+      const svg = d3.select("svg");
+
+      let itemSyms = svg.selectAll(".item")
+        .data(items);
+
+      itemSyms
+        .style("fill", (_, i) => changedAssignments[i] ? "red" : "black")
+        .transition()
+          .delay(1000)
+          .duration(500)
+          .style("fill", "black");
+
+      itemSyms
+        .enter()
+          .append("circle")
+            .attr("class", "item")
+            .attr("cy", (_, i) => itemPos(i, items.length)[1])
+            .attr("cx", (_, i) => itemPos(i, items.length)[0])
+            .attr("r", 8);
+
+      itemSyms
+        .exit()
+          .remove();
+
+      let partSyms = svg.selectAll(".partition")
+        .data(partitions)
+          .attr("cy", (_, i) => partPos(i, partitions.length)[1])
+          .attr("cx", (_, i) => partPos(i, partitions.length)[0])
+          .attr("r", 10);
+
+      partSyms
+        .enter()
+          .append("circle")
+            .attr("class", "partition")
+            .attr("cy", (_, i) => partPos(i, partitions.length)[1])
+            .attr("cx", (_, i) => partPos(i, partitions.length)[0])
+            .attr("r", 10);
+
+      partSyms
+        .exit()
+          .remove();
+
+      const computePath = (d) => {
+        let path = d3.path(),
+            itemNo = items.indexOf(d["item"]),
+            partNo = partitions.indexOf(d["partition"]),
+            itemXY = itemPos(itemNo, items.length),
+            partXY = partPos(partNo, partitions.length);
+        path.moveTo(itemXY[0], itemXY[1]);
+        path.lineTo(partXY[0], partXY[1]);
+        path.closePath();
+        return path;
+      };
+
+      let arcs = svg.selectAll(".assignment")
+        .data(assignments, (d) => d["item"])
+          .attr("d", computePath);
+      arcs
+        .style("stroke", (_, i) => changedAssignments[i] ? "red" : "black")
+        .style("stroke-width", (_, i) => changedAssignments[i] ? "2px" : "1px")
+        .transition()
+          .delay(1000)
+          .duration(500)
+          .style("stroke", "black")
+          .style("stroke-width", "1px");
+
+      arcs
+        .enter()
+          .append("path")
+            .attr("class", "assignment")
+            .attr("d", computePath);
+
+      arcs
+        .exit()
+          .remove();
+    }
+
+    render(partitionGenerator, partitions, items);
+  </script>
+  </body>
+</html>

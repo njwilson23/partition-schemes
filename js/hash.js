@@ -1,6 +1,6 @@
 exports.id = 'hash';
 
-crypto = require('crypto');
+const md5 = require('md5');
 
 String.prototype.hashCode = function() {
   let hash = 0, chr;
@@ -12,8 +12,11 @@ String.prototype.hashCode = function() {
   return hash;
 };
 
-exports.string = (s) => {
-  let digest = new crypto.Hash("sha1").update(s).digest();
+exports.md5 = (s) => md5(s).hashCode();
+
+/*
+const crypto = require('crypto');
+const arr2int = (digest) => {
   let hash = 0;
   digest.forEach((b) => {
     hash = ((hash << 5) - hash) + b;
@@ -22,3 +25,8 @@ exports.string = (s) => {
   return hash;
 }
 
+exports.string = (s) => {
+  let digest = new crypto.Hash("sha1").update(s).digest();
+  return arr2int(digest);
+};
+*/

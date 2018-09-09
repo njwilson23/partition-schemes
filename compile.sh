@@ -2,7 +2,7 @@
 
 set -eu
 
-browserify js/partition.js -o tmp.js
+browserify -r ./js/partition.js:partition -o tmp.js
 uglifyjs tmp.js -o partitioning.js --compress --mangle
 
 rm tmp.js

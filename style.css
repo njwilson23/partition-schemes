@@ -1,0 +1,30 @@
+div.columnContainer {
+  width: 90%;
+  display: flex;
+}
+
+div#partitions {
+  flex: 0 0 65%;
+}
+
+div#items {
+  flex: 1;
+}
+
+div.button {
+  background: #DDD;
+  color: #444;
+  border: 1px;
+  display: inline-block;
+  cursor: pointer;
+  width: 8em;
+  height: 2em;
+  text-align: center;
+  vertical-align: middle;
+}
+
+path {
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
+}
