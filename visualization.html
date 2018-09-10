@@ -8,7 +8,7 @@
 
   <body>
 
-  <svg width="800" height="400"></svg>
+  <svg width="400" height="600"></svg>
 
   <br>
   <select id="scheme-select" onchange="setPartitioner()">
@@ -29,6 +29,8 @@
     let items = [...Array(32).keys()].map((i) => `item${i}`);
     let partitionGenerator = partition.HRW;
     let oldAssignments = [];
+    let drawDelay = 750;
+    let drawDuration = 1500;
 
     const choices = {
       "modK": partition.modK,
@@ -69,8 +71,8 @@
       const changedAssignments = diffAssignments(oldAssignments, assignments);
       oldAssignments = assignments;
 
-      const itemPos = (i, n) => [(i/(n-1)) * 780 + 10, 50];
-      const partPos = (i, n) => [(i/(n-1)) * 600 + 100, 350];
+      const itemPos = (i, n) => [50, (i/(n-1)) * 580 + 10];
+      const partPos = (i, n) => [350, (i/(n-1)) * 400 + 100];
 
       const svg = d3.select("svg");
 
@@ -80,8 +82,8 @@
       itemSyms
         .style("fill", (_, i) => changedAssignments[i] ? "red" : "black")
         .transition()
-          .delay(1000)
-          .duration(500)
+          .delay(drawDelay)
+          .duration(drawDuration)
           .style("fill", "black");
 
       itemSyms
@@ -101,7 +103,7 @@
 
       partSyms
         .transition()
-          .duration(250)
+          .duration(500)
           .attr("cy", (_, i) => partPos(i, partitions.length)[1])
           .attr("cx", (_, i) => partPos(i, partitions.length)[0])
           .attr("r", 12);
@@ -114,13 +116,13 @@
             .attr("cx", (_, i) => partPos(i, partitions.length)[0])
             .attr("r", 0)
           .transition()
-            .duration(250)
+            .duration(500)
             .attr("r", 12);
 
       partSyms
         .exit()
           .transition()
-            .duration(250)
+            .duration(500)
             .attr("r", 0)
             .remove();
 
@@ -137,14 +139,17 @@
       };
 
       let arcs = svg.selectAll(".assignment")
-        .data(assignments, (d) => d["item"])
-          .attr("d", computePath);
+        .data(assignments, (d) => d["item"]);
+
       arcs
-        .style("stroke", (_, i) => changedAssignments[i] ? "red" : "black")
-        .style("stroke-width", (_, i) => changedAssignments[i] ? "2px" : "1px")
         .transition()
-          .delay(1000)
           .duration(500)
+          .attr("d", computePath)
+          .style("stroke", (_, i) => changedAssignments[i] ? "red" : "black")
+          .style("stroke-width", (_, i) => changedAssignments[i] ? "2px" : "1px")
+        .transition()
+          .delay(drawDelay)
+          .duration(drawDuration)
           .style("stroke", "black")
           .style("stroke-width", "1px");
 
