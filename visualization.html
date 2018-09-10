@@ -3,7 +3,6 @@
   <head>
     <meta charset='utf-8'>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <link href="style.css" rel="stylesheet">
   </head>
 
   <body>
@@ -28,7 +27,7 @@
     let partitions = ["partition0", "partition1", "partition2"];
     let items = [...Array(32).keys()].map((i) => `item${i}`);
     let partitionGenerator = partition.HRW;
-    let oldAssignments = [];
+    let oldAssignments = items.map((it) => ({"item": it, "partition": null}));
     let drawDelay = 750;
     let drawDuration = 1500;
 
@@ -58,11 +57,7 @@
 
     const diffAssignments = (oldAssignments, newAssignments) =>
       newAssignments.map((n) =>
-        n.partition !== (
-          oldAssignments.length !== 0 ?
-            oldAssignments.find((o) => o.item === n.item).partition :
-            null
-        )
+        n.partition !== oldAssignments.find((o) => o.item === n.item).partition
       );
 
     const render = (partitionGenerator, partitions, items) => {
@@ -157,6 +152,7 @@
         .enter()
           .append("path")
             .attr("class", "assignment")
+            .style("stroke", "black")
             .attr("d", computePath);
 
       arcs
