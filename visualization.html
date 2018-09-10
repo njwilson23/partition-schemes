@@ -12,9 +12,10 @@
   <br>
   <select id="scheme-select" onchange="setPartitioner()">
     <option value="modK">mod-K</option>
-    <option value="roundRobin">Round-Robin</option>
     <option value="HRW">Highest random weight</option>
     <option value="consistentHash">Consistent hashing</option>
+    <option value="roundRobin">Round-Robin</option>
+    <option value="columnMajor">Column-Major</option>
   </select>
 
   <button type="button" id="add" onclick="addRandom()">Add Server</div>
@@ -34,6 +35,7 @@
     const choices = {
       "modK": partition.modK,
       "roundRobin": partition.roundRobin,
+      "columnMajor": (hosts) => partition.columnMajor(hosts, items.length),
       "HRW": partition.HRW,
       "consistentHash": partition.consistentHash,
     };

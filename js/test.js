@@ -71,16 +71,20 @@ testBisect()
 
 let hosts = ["hostA", "hostB", "hostC", "hostD"];
 testUniformity(partition.roundRobin(hosts), "Round-Robin");
+testUniformity(partition.columnMajor(hosts, 100), "Column-Major");
 testUniformity(partition.modK(hosts), "mod-K");
 testUniformity(partition.HRW(hosts), "HRW");
 testUniformity(partition.consistentHash(hosts), "ConsistentHash");
 
 testReassignments(partition.roundRobin, "Round-Robin");
+testReassignments((hosts) => partition.columnMajor(hosts, 100), "Column-Major");
 testReassignments(partition.modK, "mod-K");
 testReassignments(partition.HRW, "HRW");
 testReassignments(partition.consistentHash, "ConsistentHash");
 
 
-// let partitioner = partition.consistentHash(["hostA", "hostB"]);
-// let things = [...Array(10).keys()].map((n) => `thing${n}`);
-// console.log(things.map(partitioner));
+/*
+let partitioner = partition.columnMajor(["hostA", "hostB"], 10);
+let things = [...Array(10).keys()].map((n) => `thing${n}`);
+console.log(things.map(partitioner));
+*/

@@ -16,16 +16,25 @@ exports.roundRobin = (hosts) => {
     const host = hosts[nextToAllocate];
     nextToAllocate = (nextToAllocate == hostCount - 1) ? 0 : nextToAllocate + 1;
     return host;
-  }
+  };
 }
 
-/* Column-wise partitioner
+/* Column-major partitioner
  *
  * This is essentially the transpose of round-robin, and reduces the
- * reassignment rate from (n-1)/n  to 1/2.
- *
- * NOT IMPLEMENTED
+ * reassignment rate from (n-1)/n  to 1/2. it assumes we know the total number
+ * of items to be allocated.
  */
+exports.columnMajor = (hosts, itemCount) => {
+  const blockSize = itemCount / hosts.length;
+  let allocated = 0;
+
+  return (item) => {
+    const hostIndex = Math.floor(allocated / blockSize);
+    allocated = (allocated == itemCount - 1) ? 0 : allocated + 1;
+    return hosts[hostIndex];
+  };
+}
 
 /* mod-K partitioner
  *
